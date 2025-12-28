@@ -1,0 +1,41 @@
+FUNCTION_BLOCK Model
+VAR_INPUT
+	mesafe : REAL;
+	sumiktari : REAL;
+END_VAR
+VAR_OUTPUT
+	hiz : REAL;
+END_VAR
+FUZZIFY mesafe
+	TERM kisa := (0,1)(10,1)(20,0);
+	TERM orta := (10,0)(20,1)(40,1)(60,0);
+	TERM uzun := (40,0)(60,1)(80,1);
+END_FUZZIFY
+FUZZIFY sumiktari
+	TERM az := (0,1)(25,1)(50,0);
+	TERM orta := (25,0)(50,1)(75,1)(100,0);
+	TERM cok := (75,0)(100,1);
+END_FUZZIFY
+DEFUZZIFY hiz
+	TERM cokyavas := (0,1)(10,0);
+	TERM yavas := (0,0)(10,1)(15,0);
+	TERM orta := (10,0)(25,1)(35,0);
+	TERM hizli := (25,0)(35,1)(50,1);
+	METHOD : COG;
+	DEFAULT := 0;
+END_DEFUZZIFY
+RULEBLOCK kuralblok
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	RULE 1: IF mesafe IS kisa AND sumiktari IS az THEN hiz IS yavas;
+	RULE 2: IF mesafe IS kisa AND sumiktari IS orta THEN hiz IS cokyavas;
+	RULE 3: IF mesafe IS kisa AND sumiktari IS cok THEN hiz IS cokyavas;
+	RULE 4: IF mesafe IS orta AND sumiktari IS az THEN hiz IS orta;
+	RULE 5: IF mesafe IS orta AND sumiktari IS orta THEN hiz IS yavas;
+	RULE 6: IF mesafe IS orta AND sumiktari IS cok THEN hiz IS yavas;
+	RULE 7: IF mesafe IS uzun AND sumiktari IS az THEN hiz IS hizli;
+	RULE 8: IF mesafe IS uzun AND sumiktari IS orta THEN hiz IS orta;
+	RULE 9: IF mesafe IS uzun AND sumiktari IS cok THEN hiz IS orta;
+END_RULEBLOCK
+END_FUNCTION_BLOCK

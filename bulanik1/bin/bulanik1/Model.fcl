@@ -1,0 +1,51 @@
+FUNCTION_BLOCK model
+
+VAR_INPUT // girdiler
+	servis : REAL;
+	yemek : REAL;
+END_VAR
+VAR_OUTPUT //cikilar
+	tur : REAL;
+END_VAR
+
+// bulaniklastirma
+FUZZIFY servis
+	TERM kotu := (0,1)(4,0); // sifirda bir, dortte sifirdir
+	TERM iyi := (2,0)(4,1)(6,1)(8,0);
+	TERM mukemmel := (6,0)(8,1)(9,1);
+END_FUZZIFY
+
+FUZZIFY yemek
+	TERM tatsiz := (0,1)(4,0); // sifirda bir, dortte sifirdir
+	TERM orta := (2,0)(4,1)(6,1)(8,0);
+	TERM lezzetli:= (6,0)(8,1)(9,1);
+END_FUZZIFY
+
+// bulaniklastirma ve durulama
+DEFUZZIFY tur
+	TERM ucuz := trape 0 0 25 50;
+	TERM orta := trian 25 50 75;
+	TERM iyi := trian 50 75 100;
+	TERM cokiyi := trian 75 100 100;
+	
+	METHOD: COG; //durulama yontemi belirtilir
+	DEFAULT := 50;
+END_DEFUZZIFY
+
+RULEBLOCK kuralblok
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	
+	RULE 1: IF servis IS kotu AND yemek IS tatsiz THEN tur IS ucuz;
+	RULE 2: IF servis IS kotu AND yemek IS orta THEN tur IS orta;
+	RULE 3: IF servis IS kotu AND yemek IS lezzetli THEN tur IS orta;
+	RULE 4: IF servis IS iyi AND yemek IS tatsiz THEN tur IS orta;
+	RULE 5: IF servis IS iyi AND yemek IS orta THEN tur IS iyi;
+	RULE 6: IF servis IS iyi AND yemek IS lezzetli THEN tur IS iyi;
+	RULE 7: IF servis IS mukemmel AND yemek IS tatsiz THEN tur IS iyi;
+	RULE 8: IF servis IS mukemmel AND yemek IS orta THEN tur IS cokiyi;
+	RULE 9: IF servis IS mukemmel AND yemek IS lezzetli THEN tur IS cokiyi;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK

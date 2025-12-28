@@ -1,0 +1,45 @@
+FUNCTION_BLOCK camasirmakinesi
+VAR_INPUT
+	kirlilikorani : REAL;
+	camasirturu : REAL;
+END_VAR
+VAR_OUTPUT
+	yikamasuresi : REAL;
+END_VAR
+
+FUZZIFY kirlilikorani
+	TERM az := (0,1)(50,0);
+	TERM orta := (0,0)(50,1)(90,0);
+	TERM fazla := (60,0)(80,1)(100,1);
+END_FUZZIFY
+FUZZIFY camasirturu
+	TERM narin := (0,1)(50,0);
+	TERM karisik := (0,0)(50,1)(100,0);
+	TERM beyaz := (50,0)(75,1)(100,1);
+END_FUZZIFY
+DEFUZZIFY yikamasuresi
+	TERM cokkisa := (0,1)(15,1)(30,0);
+	TERM kisa := (15,0)(30,1)(45,0);
+	TERM normal := (30,0)(45,1)(60,0);
+	TERM uzun := (45,0)(60,1)(100,1)(145,0);
+	TERM cokuzun := (100,0)(120,1)(145,1);
+	METHOD : COG;
+	DEFAULT := 60;
+END_DEFUZZIFY
+RULEBLOCK kuralblok
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	
+	RULE 1: IF kirlilikorani IS az AND camasirturu IS narin THEN yikamasuresi IS cokkisa;
+	RULE 2: IF kirlilikorani IS az AND camasirturu IS karisik THEN yikamasuresi IS kisa;
+	RULE 3: IF kirlilikorani IS az AND camasirturu IS beyaz THEN yikamasuresi IS normal;
+	RULE 4: IF kirlilikorani IS orta AND camasirturu IS narin THEN yikamasuresi IS kisa;
+	RULE 5: IF kirlilikorani IS orta AND camasirturu IS karisik THEN yikamasuresi IS normal;
+	RULE 6: IF kirlilikorani IS orta AND camasirturu IS beyaz THEN yikamasuresi IS uzun;
+	RULE 7: IF kirlilikorani IS fazla AND camasirturu IS narin THEN yikamasuresi IS normal;
+	RULE 8: IF kirlilikorani IS fazla AND camasirturu IS karisik THEN yikamasuresi IS uzun;
+	RULE 9: IF kirlilikorani IS fazla AND camasirturu IS beyaz THEN yikamasuresi IS cokuzun;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
